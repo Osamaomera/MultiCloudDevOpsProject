@@ -10,14 +10,14 @@ COPY build.gradle settings.gradle ./
 # Download and resolve dependencies using the Gradle Wrapper
 COPY gradlew .
 COPY gradle gradle
-RUN chmod +x ./gradlew
-RUN ./gradlew dependencies --info
+RUN chmod +x gradlew
+RUN ./gradlew dependencies
 
 # Copy the rest of the source code
 COPY . .
 
 # Build the application using the Gradle Wrapper
-RUN chmod +x ./gradlew
+RUN chmod +x gradlew
 RUN ./gradlew build --stacktrace
 
 # Use a minimal base image for the runtime
