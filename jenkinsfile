@@ -1,3 +1,4 @@
+@Library('Jenkins-Shared-Library')_
 pipeline {
     agent any
 
@@ -54,7 +55,7 @@ pipeline {
             steps {
                 script { 
                         // Navigate to the directory contains OpenShift YAML files
-                	dir('OpenShift') {
+                	dir('k8s') {
 				deployOnOpenShift("${openshiftCredentialsID}", "${openshiftCluster}", "${openshifProject}", "${imageName}")
                     	}
                 }
