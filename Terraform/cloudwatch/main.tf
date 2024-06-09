@@ -43,7 +43,7 @@ resource "aws_sns_topic_subscription" "cloudwatch_sns_subscription" {
 
 #Set CloudWatch alarm for cpu
 resource "aws_cloudwatch_metric_alarm" "ec2_cpu_alarm" {
-  alarm_name          = "iVolve-EC2CPUMetricAlarm"
+  alarm_name          = "terraform-Ec2-Cpu-80%"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
@@ -63,7 +63,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu_alarm" {
 
 #Set CloudWatch alarm for memory
 resource "aws_cloudwatch_metric_alarm" "ec2_memory_alarm" {
-  alarm_name          = "iVolve-EC2MemoryMetricAlarm"
+  alarm_name          = "terraform-Ec2-Mem-80%"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "MemoryUtilization"  
