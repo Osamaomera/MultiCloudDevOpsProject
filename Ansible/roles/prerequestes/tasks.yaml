@@ -1,0 +1,28 @@
+---
+#__________________ Install prerequisites packages __________________#
+- name: Update and upgrade apt
+  apt:
+    update_cache: yes
+    upgrade: safe
+
+- name: Install prerequisites
+  apt:
+    name:
+      - wget
+      - apt-transport-https
+      - gnupg2
+      - software-properties-common
+      - unzip
+      - curl
+      - tar
+      - openjdk-17-jdk
+      - openjdk-17-jre
+    state: present
+    update_cache: yes
+- name: Install kubernetes CLI (kubectl)
+  become: yes
+  become_user: root
+  shell: |
+    curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
+    mv kubectl /usr/local/bin/
+    chmod +x /usr/local/bin/kubectl
