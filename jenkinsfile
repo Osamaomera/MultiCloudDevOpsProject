@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                 	// Navigate to the directory contains Dockerfile
-                 	dir('App') {
+                 	dir('app') {
                  		buildandPushDockerImage("${dockerHubCredentialsID}", "${imageName}")
                         
                     	}
