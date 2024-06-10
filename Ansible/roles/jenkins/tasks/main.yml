@@ -92,6 +92,8 @@
     - openshift-login
     - openshift-sync
     - openshift-token-credentials
+    - github-branch-source
+    - github-plugin
 
 #______________________________ start Jenkins ______________________________#
 - name: Skip initial setup
