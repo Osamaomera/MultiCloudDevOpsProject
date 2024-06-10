@@ -19,10 +19,28 @@
       - openjdk-17-jre
     state: present
     update_cache: yes
+    
 - name: Install kubernetes CLI (kubectl)
-  become: yes
+  become: true
   become_user: root
   shell: |
     curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
     mv kubectl /usr/local/bin/
     chmod +x /usr/local/bin/kubectl
+
+- name: Download, extract, and install OpenShift CLI
+  shell: |
+    wget -O /tmp/openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
+    tar -xzvf /tmp/openshift-client-linux.tar.gz -C /tmp/
+    mv /tmp/oc /usr/local/bin/
+    chmod +x /usr/local/bin/oc
+  args:
+    creates: /usr/local/bin/oc
+
+- name: Verify OpenShift CLI installation
+  shell: oc version
+  register: oc_version
+  ignore_errors: true
+
+- debug:
+    msg: "{{ oc_version.stdout }}"

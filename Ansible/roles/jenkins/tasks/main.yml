@@ -3,7 +3,7 @@
 - name: Update apt cache 
   apt:
     update_cache: yes
-  become: yes
+  become: true
 
 #________________________ Jenkins installation ________________________#
 - name: Ensure the jenkins apt repository key is installed
@@ -86,6 +86,12 @@
     - sonar
     - kubernetes
     - kubernetes-cli
+    - openshift-client
+    - maven-plugin
+    - pipeline-maven
+    - openshift-login
+    - openshift-sync
+    - openshift-token-credentials
 
 #______________________________ start Jenkins ______________________________#
 - name: Skip initial setup

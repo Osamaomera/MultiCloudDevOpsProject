@@ -1,0 +1,24 @@
+---
+#__________________ Git installation __________________#
+- name: Install Git
+  apt:
+    name: git
+    state: present
+  become: true
+
+#________________________Configure Git user_____________#
+- name: Set Git user name
+  git_config:
+    name: user.name
+    scope: global
+    value: "{{ git_user_name }}"
+  become: true
+  become_user: "{{ ansible_user }}"
+
+- name: Set Git user email
+  git_config:
+    name: user.email
+    scope: global
+    value: "{{ git_user_email }}"
+  become: true
+  become_user: "{{ ansible_user }}"

@@ -1,4 +1,14 @@
 ---
+#____________________Install dependencies______________________#
+- name: Install dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
+    update_cache: yes
 #________________________ Install Docker ________________________#
 - name: Install Docker
   apt:
