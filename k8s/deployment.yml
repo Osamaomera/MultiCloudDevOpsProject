@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ivolve-website
-        image: osayaman74/spot:5
+        image: osayman74/spot:5
         ports:
         - containerPort: 8081
         volumeMounts:
