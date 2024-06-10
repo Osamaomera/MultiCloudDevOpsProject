@@ -12,8 +12,13 @@ pipeline {
         k8sCredentialsID	        = 'k8s'	    				                     // KubeConfig credentials ID.
     }
 
+    triggers {
+        githubPush() // Trigger pipeline on GitHub push events
+    }
+    
     stages {
-            stage('Repo Checkout') {
+                        
+        stage('Repo Checkout') {
             steps {
             	script {
                 	checkoutRepo
