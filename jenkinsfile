@@ -28,16 +28,16 @@ pipeline {
     	    }
 	    }
 	
-        // stage('Run SonarQube Analysis') {
-        //     steps {
-        //         script {
-        //             	// Navigate to the directory contains the Application
-        //             	dir('App') {
-        //             		runSonarQubeAnalysis()
-        //             	}
-        //         }
-        //     }
-        // }
+        stage('Run SonarQube Analysis') {
+            steps {
+                script {
+                    	// Navigate to the directory contains the Application
+                    	dir('App') {
+                    		runSonarQubeAnalysis()
+                    	}
+                }
+            }
+        }
 
          stage('Build and Push Docker Image') {
             steps {
