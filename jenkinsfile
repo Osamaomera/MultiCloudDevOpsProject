@@ -1,8 +1,12 @@
-@Library('Jenkins-Shared-Library')_
+@Library('shared_library')_
 pipeline {
     agent any
-
+    tools {
+        jdk 'jdk-17'
+        maven 'maven'
+    }
     environment {
+        SCANNER_HOME= tool 'sonar-scanner'
         dockerHubCredentialsID	    = 'DockerHub'  		    			         // DockerHub credentials ID.
 	    imageName                   = 'osayman74/spot'                           // DockerHub repo/image_name.
         k8sCredentialsID	        = 'k8s'	    				                     // KubeConfig credentials ID.
