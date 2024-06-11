@@ -7,6 +7,7 @@ pipeline {
         jdk 'jdk-17'
         maven 'maven'
     }
+
     environment {
         SCANNER_HOME                = tool 'sonar-scanner'
         dockerHubCredentialsID	    = 'DockerHub'  		    			         // DockerHub credentials ID.
@@ -35,7 +36,18 @@ pipeline {
                 	dir('App') {
                 		runUnitTests
             		}
-        	}
+        	   }
+    	    }
+	    }
+
+        stage('Run Code Compile') {
+            steps {
+                script {
+                	// Navigate to the directory contains the Application
+                	dir('App') {
+                		codeCompile
+            		}
+        	    }
     	    }
 	    }
 	
@@ -46,16 +58,28 @@ pipeline {
                     	dir('app') {
                     		runSonarQubeAnalysis()
                     	}
+                    }
                 }
             }
-        }
 
-         stage('Build and Push Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 script {
                 	// Navigate to the directory contains Dockerfile
                  	dir('app') {
-                 		buildandPushDockerImage("${dockerHubCredentialsID}", "${imageName}")
+                 		buildDockerImage("${dockerHubCredentialsID}", "${imageName}")
+                        
+                    	}
+                    }
+                }
+            }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                	// Navigate to the directory contains Dockerfile
+                 	dir('app') {
+                 		pushDockerImage("${dockerHubCredentialsID}", "${imageName}")
                         
                     	}
                 }
@@ -74,7 +98,7 @@ pipeline {
         // }
     }
 
-        post {
+post {
         success {
             echo "${JOB_NAME}-${BUILD_NUMBER} pipeline succeeded"
         }
