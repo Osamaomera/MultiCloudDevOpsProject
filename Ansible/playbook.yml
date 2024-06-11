@@ -6,6 +6,7 @@
   roles:
     - packages
     - Git
+    - postgres
     - SonarQube
     - jenkins
     - docker
