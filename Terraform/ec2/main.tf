@@ -68,5 +68,11 @@ resource "aws_instance" "ec2" {
   
   tags = {
       Name = "iVolve-ec2"
-    } 
+    }
+
+    provisioner "local-exec" {
+    when        = create
+    on_failure  = continue
+    command = "echo ${self.public_ip} >> ec2-ip.txt"
+ } 
 }
