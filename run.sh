@@ -3,8 +3,8 @@
 #script to run terraform, then update ansible inventory with EC2 IP, then run ansible playbook
 
 #Set the paths to Terraform and Ansible directories
-terraform_dir="/home/osamaayman/deploy_app_on_aws_eks/Terraform"
-ansible_dir="/home/osamaayman/deploy_app_on_aws_eks/Ansible"
+terraform_dir="/home/osamaayman/Documents/MultiCloudDevOpsProject/Terraform"
+ansible_dir="/home/osamaayman/Documents/MultiCloudDevOpsProject/Ansible"
 
 #run terraform
 terraform() {
@@ -36,7 +36,7 @@ ansible() {
     cd "$ansible_dir"
     echo "Running Ansible playbook in $ansible_dir"
     export ANSIBLE_HOST_KEY_CHECKING=False
-    ansible-playbook -i inventory.txt playbook.yml --ask-valut-pass
+    ansible-playbook -i inventory.txt playbook.yml 
     echo "Ansible execution completed."
 }
 
