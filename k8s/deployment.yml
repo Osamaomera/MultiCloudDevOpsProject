@@ -16,7 +16,7 @@ spec:
       - name: ivolve-website
         image: osayman74/spot:5
         ports:
-        - containerPort: 8081
+        - containerPort: 8080
         volumeMounts:
         - name: storage
           mountPath: /app/data 

@@ -14,16 +14,15 @@ spec:
     - podSelector:
         matchLabels:
           app: ivolve-website
-  ports:
-  - protocol: TCP
-    port: 8081
+    ports:
+    - protocol: TCP
+      port: 8080
     
   egress:
   - to:
     - podSelector:
         matchLabels:
           app: ivolve-website
-  ports:
-  - protocol: TCP
-    port: 8081
-
+    ports:
+    - protocol: TCP
+      port: 8080
