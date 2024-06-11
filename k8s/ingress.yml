@@ -1,25 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ivolve-website-ingress
-  annotations:
-    # These annotations are specific to the NGINX Ingress Controller.
-    # Modify them according to your Ingress Controller if you use another one.
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: Ivolve-website-ingress
+  labels:
+    name: Ivolve-website-ingress
 spec:
   rules:
-  - host: ivolve-website.example.com  # Replace with your domain name
+  - host: ivolve-website.com
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - pathType: Prefix
+        path: "/"
         backend:
           service:
             name: ivolve-website-service
-            port:
+            port: 
               number: 8081
-  # Optionally, you can specify a TLS configuration if you have a TLS secret
-  tls:
-  - hosts:
-    - ivolve-website.example.com
-    secretName: ivolve-website-tls  # Name of the TLS secret
