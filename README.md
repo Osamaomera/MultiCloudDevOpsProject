@@ -393,3 +393,6 @@ Access Grafana UI in your browser using the Load Balancer URL:
   - `docker push myapp`: Push a Docker image to the registry.
 - **Jenkins Commands**:
  
+ ### Refrences 
+
+https://www.coachdevops.com/2022/05/how-to-setup-monitoring-on-kubernetes.html
