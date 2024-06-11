@@ -90,7 +90,7 @@ pipeline {
         //     steps {
         //         script { 
         //                 // Navigate to the directory contains OpenShift YAML files
-        //         	dir('k8s') {
+        //         	dir('OpenShift') {
 		// 		deployOnOpenShift("${openshiftCredentialsID}", "${openshiftCluster}", "${openshifProject}", "${imageName}")
         //             	}
         //         }
