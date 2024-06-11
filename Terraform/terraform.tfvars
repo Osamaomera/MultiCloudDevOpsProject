@@ -11,9 +11,9 @@ subnet = {
       }
      
 #EC2 module value
-public_key_path = "~/.ssh/ivolve.pub"
-ec2_ami_id 	= "ami-0c7217cdde317cfec" #ubuntu AMI
-ec2_type  	= "m5.large"
+public_key_path        = "~/.ssh/ivolve.pub"
+ec2_ami_id 	           = "ami-0c7217cdde317cfec" #ubuntu AMI
+ec2_type  	           = "m5.large"
 
 #CloudWatch module value
 sns_email = "osama.omera68@gmail.com"
