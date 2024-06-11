@@ -52,7 +52,7 @@ resource "aws_security_group" "sg" {
 
 #Create Key Pair
 resource "aws_key_pair" "key_pair" {
-  key_name   = "iVolve-key-pair"
+  key_name   = "ec2-ivolve"
   public_key = file(var.public_key_path)
 }
 
