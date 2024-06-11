@@ -1,18 +1,25 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ivolve-website-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
   labels:
-    name: ivolve-website-ingress
+    app.kubernetes.io/instance: myapp
+  name: ivolve-website-ingress
+  namespace: default
 spec:
   rules:
-  - host: ivolve-website.com
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: ivolve-website-service
-            port: 
-              number: 8081
+    - host: ivolve-website.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: ivolve-website-service
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - ivolve-website.example.com
+      secretName: ivolve-website-tls
