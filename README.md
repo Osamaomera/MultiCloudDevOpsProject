@@ -230,6 +230,89 @@ pipeline {
 ### Task
 - Deliver setup instructions for centralized logging on OpenShift for container logs.
 
+## Overview
+
+This guide explains how to set up Kubernetes monitoring using Prometheus and Grafana in an EKS cluster using Helm charts. This setup includes Prometheus for collecting and storing metrics data, Alert Manager for sending alerts, and Grafana for visualizing the metrics in a UI.
+
+### Key Components
+
+1. **Prometheus Server:** Processes and stores metrics data.
+2. **Alert Manager:** Sends alerts to various systems/channels.
+3. **Grafana:** Visualizes scraped data in a user-friendly UI.
+
+### Installation Method
+
+We recommend using Helm charts for a streamlined installation process. Helm is a package manager for Kubernetes that simplifies the deployment of complex systems like Prometheus and Grafana.
+
+### Prerequisites
+
+- EKS Cluster up and running
+- Helm3 installed
+- EC2 instance to access the EKS cluster
+
+## Implementation Steps
+
+### Add Helm Repositories
+
+```bash
+helm repo add stable https://charts.helm.sh/stable
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+```
+
+### Create Prometheus Namespace
+
+```bash
+kubectl create namespace prometheus
+```
+
+### Install kube-prometheus-stack
+
+```bash
+helm install stable prometheus-community/kube-prometheus-stack -n prometheus
+```
+
+Verify the installation:
+
+```bash
+kubectl get pods -n prometheus
+kubectl get svc -n prometheus
+```
+
+### Access Grafana UI
+
+Get the Load Balancer URL:
+
+```bash
+kubectl get svc -n prometheus
+```
+
+Access Grafana UI in your browser using the Load Balancer URL:
+
+- URL: [Grafana URL]
+- Username: admin
+- Password: prom-operator
+
+### Create Dashboards in Grafana
+
+1. **Kubernetes Monitoring Dashboard:**
+   - Click '+' on the left panel and select ‘Import’.
+   - Enter the dashboard ID 12740 from Grafana.com Dashboard.
+   - Select ‘Prometheus’ as the data source.
+   - Click ‘Import’.
+
+2. **Kubernetes Cluster Monitoring Dashboard:**
+   - Click '+' on the left panel and select ‘Import’.
+   - Enter the dashboard ID 3119 from Grafana.com Dashboard.
+   - Select ‘Prometheus’ as the data source.
+   - Click ‘Import’.
+
+3. **POD Monitoring Dashboard:**
+   - Click '+' on the left panel and select ‘Import’.
+   - Enter the dashboard ID 6417 from Grafana.com Dashboard.
+   - Select ‘Prometheus’ as the data source.
+   - Click ‘Import’.
+
+
 ### Deliverables
 - Instructions for setting up centralized logging.
 
