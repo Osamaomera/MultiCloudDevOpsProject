@@ -11,7 +11,7 @@ subnet = {
       }
      
 #EC2 module value
-public_key_path        = "/home/osamaayman/ec2-ivolve.pem"
+public_key_path        = "/home/osamaayman/.ssh/id_rsa.pub"
 ec2_ami_id 	           = "ami-04b70fa74e45c3917" #ubuntu AMI
 ec2_type  	           = "m5.large"
 
