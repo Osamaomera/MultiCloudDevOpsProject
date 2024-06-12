@@ -76,7 +76,7 @@ The infrastructure for this project is provisioned using Terraform. It includes 
 
 This setup provisions an EC2 instance to run Jenkins, which will be used for pipeline execution.
 
-For detailed information, refer to the [Terraform README](terraform/README.md).
+For detailed information, refer to the [Terraform README](Terraform/README.md).
 
 ## Configuration Management
 
@@ -89,7 +89,7 @@ Configuration management is handled by Ansible. The playbooks configure the EC2 
 - `jenkins` role
 - `docker` role
 
-For detailed information, refer to the [Ansible README](ansible/README.md).
+For detailed information, refer to the [Ansible README](Ansible/README.md).
 
 ## Containerization
 
