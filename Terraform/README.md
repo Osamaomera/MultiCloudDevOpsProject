@@ -1,4 +1,3 @@
-Here's a detailed README file for the Terraform use in your project:
 # Terraform Infrastructure for MultiCloudDevOpsProject
 
 ## Overview
@@ -44,7 +43,6 @@ The VPC module creates a Virtual Private Cloud (VPC) in AWS to host your resourc
 - **outputs.tf**: Outputs the VPC ID.
 - **variables.tf**: Defines the input variables for the VPC.
 
-#### Example Usage
 ```hcl
 module "vpc" {
   source             = "./vpc"
@@ -52,6 +50,7 @@ module "vpc" {
 }
 
 ```
+![alt text](../screenshots/vpc.png)
 
 ### Subnet Module
 
@@ -63,7 +62,6 @@ The subnet module creates public and private subnets within the VPC.
 - **outputs.tf**: Outputs the subnet IDs.
 - **variables.tf**: Defines the input variables for the subnets.
 
-#### Example Usage
 ```hcl
 module "subnet" {
   source             = "./subnet"
@@ -83,7 +81,6 @@ The EC2 module provisions EC2 instances to host Jenkins.
 - **outputs.tf**: Outputs the instance IDs and public IP addresses.
 - **variables.tf**: Defines the input variables for the EC2 instances.
 
-#### Example Usage
 ```hcl
 module "ec2" {
   source             = "./ec2"
@@ -95,6 +92,7 @@ module "ec2" {
 }
 
 ```
+![alt text](../screenshots/ec2.png)
 
 ### CloudWatch Module
 
@@ -106,7 +104,6 @@ The CloudWatch module sets up monitoring for the EC2 instances.
 - **outputs.tf**: Outputs the CloudWatch dashboard and alarms.
 - **variables.tf**: Defines the input variables for CloudWatch.
 
-#### Example Usage
 ```hcl
 module "cloudwatch" {
   source              = "./cloudwatch"
@@ -115,6 +112,11 @@ module "cloudwatch" {
   sns_email	          = var.sns_email
 }
 ```
+![alt text](../screenshots/cloud_watch2.png)
+
+![alt text](../screenshots/cloud_watch1.png)
+
+![alt text](../screenshots/cloud_watch_dashboard.png)
 
 ## Usage Instructions
 
