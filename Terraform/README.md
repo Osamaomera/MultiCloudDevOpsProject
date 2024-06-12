@@ -70,6 +70,7 @@ module "subnet" {
   igw_id             = module.vpc.igw_id
 }
 ```
+![alt text](subnet.png)
 
 ### EC2 Module
 
