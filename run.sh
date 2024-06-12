@@ -6,7 +6,7 @@
 terraform_dir="/home/osamaayman/Documents/MultiCloudDevOpsProject/Terraform"
 ansible_dir="/home/osamaayman/Documents/MultiCloudDevOpsProject/Ansible"
 inventory_file="$ansible_dir/inventory.txt"
-private_key_file="/home/osamaayman/test.pem"
+private_key_file="/home/osamaayman/.ssh/jenkins-ec2"
 
 # Function to check for necessary tools
 check_tools() {
