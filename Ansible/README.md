@@ -137,16 +137,64 @@ The inventory file (`inventory.txt`) defines the hosts and groups of hosts on wh
 
 ## Usage
 
-To execute the Ansible playbook, run the following command:
+1. SSH Access:
+    Ensure your SSH private key file has the correct permissions:
+```bash
+    chmod 400 <your_key.pem>
+```
+![alt text](../screenshots/keygen.png)
+
+
+2. **Navigate to the Ansible Directory**:
+
+```bash
+cd ansible
+```
+
+3. **Adjust Ansible Configuration (Optional)**:
+- Modify the ansible.cfg file if necessary to configure Ansible behavior. 
+```yml
+[defaults]
+remote_user = ubuntu
+inventory = ./inventory.txt
+private_key_file = /home/osamaayman/.ssh/jenkins-ec2
+```
+4. **Execute Playbook**:
+```yaml
+    #inventory
+    jenkins-ec2 ansible_host=34.207.172.37 ansible_user=ubuntu ansible_ssh_private_key_file=/home/osamaayman/.ssh/jenkins-ec2
+```
+```yaml
+    ---
+- name: Configure Jenkins Server
+  hosts: all
+  become: true
+  gather_facts: true
+  roles:
+    - packages
+    - Git
+    - postgres
+    - SonarQube
+    - jenkins
+    - docker
+
+    
+  tasks:
+    - name: Display Jenkins IP
+      debug:
+        msg: "Jenkins server: http://{{ ansible_host }}:8080"
+        
+    - name: Display sonarqube IP
+      debug:
+        msg: "SonarQube server: http://{{ ansible_host }}:9000 , First time Login Credentials: (user: 'admin', password: 'admin')"
+```
+3. **Run Playbook**
 
 ```bash
 ansible-playbook -i inventory.txt playbook.yml
 ```
 
 This command will apply all the roles to the specified hosts, ensuring that the EC2 instances are properly configured with all necessary software and settings.
-
-## ScreenShots
-![alt text](../screenshots/keygen.png)
 
 ![alt text](../screenshots/ansible-1.png)
 

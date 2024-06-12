@@ -20,15 +20,14 @@ This project demonstrates a comprehensive DevOps pipeline that integrates Terraf
 ```
 ## Table of Contents
 
-1. [Project Setup](#project-setup)
+1. [Repository Setup](#repository-setup)
 2. [Infrastructure Provisioning](#infrastructure-provisioning)
 3. [Configuration Management](#configuration-management)
 4. [Containerization](#containerization)
-5. [Continuous Integration](#continuous-integration)
-6. [Automated Deployment Pipeline](#automated-deployment-pipeline)
-7. [Monitoring and Logging](#monitoring-and-logging)
-8. [AWS Integration](#aws-integration)
-9. [Documentation](#documentation)
+5. [Automated Deployment Pipeline](#automated-deployment-pipeline)
+6. [AWS Integration](#aws-integration)
+7. [Running the Automated Deployment Script](#running-the-automated-deployment-script)
+8. [Documentation](#documentation)
 
 ## Prerequisites
 Before using this project, ensure that you have the following prerequisites:
@@ -66,21 +65,30 @@ By following these steps, you'll have a structured repository for your DevOps pr
 
 
 ## Infrastructure Provisioning
+### Task:
 
-The infrastructure for this project is provisioned using Terraform. It includes the following modules:
-
+Provision AWS infrastructure for this project is provisioned using Terraform. It includes the following modules:
 - EC2 Module
 - VPC Module
 - Subnet Module
 - CloudWatch Module
 
-This setup provisions an EC2 instance to run Jenkins, which will be used for pipeline execution.
+### Deliverables:
 
-For detailed information, refer to the [Terraform README](Terraform/README.md).
+1. **Terraform Scripts**: 
+   - The Terraform scripts should be developed and committed to the repository provided.
+   - These scripts will define the infrastructure as code, enabling reproducible and version-controlled infrastructure provisioning.
+
+2. **Use of Terraform Modules**:
+   - Modularization of Terraform code is encouraged to promote reusability, maintainability, and readability.
+   - Utilize Terraform modules for managing different components of the infrastructure, such as VPC, Subnets, Security Groups, and EC2 instances
+
+**For detailed information, refer to the [Terraform README](Terraform/README.md)**.
 
 ## Configuration Management
 
-Configuration management is handled by Ansible. The playbooks configure the EC2 instance by installing the required software and setting up necessary environment variables. The roles included are:
+### Tasks
+the objective of Configuration management which is handled by Ansible it's playbooks configure the EC2 instance by installing the required software and setting up necessary environment variables. The roles included are:
 
 - `packages` role for prerequisites like `oc cli`, `jdk`, and `maven`
 - `git` role
@@ -89,14 +97,87 @@ Configuration management is handled by Ansible. The playbooks configure the EC2 
 - `jenkins` role
 - `docker` role
 
-For detailed information, refer to the [Ansible README](Ansible/README.md).
+### Deliverables
+- Ansible playbooks committed to the repository.
+- Use Ansible roles.
+
+#### Example Ansible Playbook
+```yaml
+---
+- name: Configure Jenkins Server
+  hosts: all
+  become: true
+  gather_facts: true
+  roles:
+    - packages
+    - Git
+    - postgres
+    - SonarQube
+    - jenkins
+    - docker
+
+  tasks:
+    - name: Display Jenkins IP
+      debug:
+        msg: "Jenkins server: http://{{ ansible_host }}:8080"
+        
+    - name: Display sonarqube IP
+      debug:
+        msg: "SonarQube server: http://{{ ansible_host }}:9000 , First time Login Credentials: (user: 'admin', password: 'admin')"
+```
+
+**For detailed information, refer to the [Ansible README](Ansible/README.md)**.
 
 ## Containerization
+Containerization plays a crucial role in this project's architecture, facilitating efficient deployment and management of applications. Docker is the primary tool used for containerization.
 
-Containerization plays a crucial role in this project's architecture, facilitating efficient deployment and management of applications. Docker is the primary tool used for containerization. Below are the key components and tasks related to containerization:
+### Task
+- Deliver Dockerfile for building the application image.
+
+ Below are the key components and tasks related to containerization:
 
 - **Dockerfile:**
   - A Dockerfile is provided to build the application image. It includes instructions on how to package the application and its dependencies into a Docker container.
+
+### Dockerfile
+```dockerfile
+# Use a minimal base image for building
+FROM gradle:7.3.3-jdk11 AS build
+
+# Set the working directory
+WORKDIR /app
+
+# Copy only the build files needed for dependency resolution
+COPY build.gradle settings.gradle ./
+
+# Download and resolve dependencies using the Gradle Wrapper
+COPY gradlew .
+COPY gradle gradle
+RUN chmod +x gradlew
+RUN ./gradlew dependencies
+
+# Copy the rest of the source code
+COPY . .
+
+# Build the application using the Gradle Wrapper
+RUN chmod +x gradlew
+RUN ./gradlew build --stacktrace
+
+# Use a minimal base image for the runtime
+FROM adoptopenjdk:11-jre-hotspot
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the JAR file from the build stage
+COPY --from=build /app/build/libs/demo-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose the port your app runs on
+EXPOSE 8080
+
+# Define the command to run your application
+CMD ["java", "-jar", "app.jar"]
+```
 
 - **Image Repository:**
   - The Docker image is pushed to a container registry, such as Docker Hub or a private registry, for storage and distribution.
@@ -104,479 +185,465 @@ Containerization plays a crucial role in this project's architecture, facilitati
 - **Container Deployment:**
   - The Docker image is deployed as containers on the target environment, ensuring consistent and isolated execution of the application.
 
+### Deliverables
+- Dockerfile committed to the repository.
 
-## Configuration Management
-
-Configuration management for this project is orchestrated by Ansible. The playbooks are responsible for configuring the EC2 instance, installing essential software, and setting up crucial environment variables. Below are the roles included in the configuration management process:
-
-- **Packages Role:**
-  - Installs prerequisites such as `oc cli`, `jdk`, and `maven` needed for the project.
-
-- **Git Role:**
-  - Handles the installation and configuration of Git on the target system.
-
-- **Postgres Role for SonarQube:**
-  - Sets up PostgreSQL for SonarQube, including user creation and database setup.
-
-- **SonarQube Role:**
-  - Configures SonarQube on the EC2 instance, ensuring it's ready for code analysis.
-
-- **Jenkins Role:**
-  - Installs and configures Jenkins on the EC2 instance to facilitate continuous integration and deployment.
-
-- **Docker Role:**
-  - Manages the installation and setup of Docker, enabling containerization within the environment.
-
-For a more comprehensive understanding of each role and its tasks, please refer to the [Ansible README](ansible/README.md).
 
 ## Automated Deployment Pipeline
 
 ### Task
 - Deliver Jenkins pipeline configuration in Jenkinsfile with stages:
   - Git Checkout
-  - Build
-  - Unit Test
-  - SonarQube Test
+  - Run Unit Test
+  - Run Code Compile
+  - Run SonarQube Analysis
+  - Build Docker Image
+  - Push Docker Image
   - Deploy on OpenShift
 
 ### Deliverables
 - Jenkins pipeline configured in the Jenkinsfile.
 
-## Monitoring and Logging
-
-### Task
-- Deliver setup instructions for centralized logging on OpenShift for container logs.
-
-### Deliverables
-- Instructions for setting up centralized logging.
-
-## AWS Integration
-
-### Task
-- Provide instructions for integrating AWS services:
-  - Use S3 Terraform Backend state.
-  - Integrate CloudWatch for monitoring.
-
-### Deliverables
-- Instructions for AWS integration in the Terraform Code.
-
-## Documentation
-
-### Task
-- Deliver comprehensive documentation:
-  - Setup instructions.
-  - Architecture overview.
-  - Troubleshooting guidelines.
-
-### Deliverables
-- Documentation is available in the repository.
-
----
-
-This README provides an overview and serves as a navigation guide for the different components of the project. Each section is linked to the respective detailed documentation for in-depth information.
-
-## Project Structure
-
-1. **Terraform**: Provisioning AWS infrastructure.
-2. **Ansible**: Configuring the EC2 instances.
-3. **OpenShift**: Deploying the application.
-4. **Jenkins**: Managing the CI/CD pipeline.
-
-## Sections
-
-### 1. Infrastructure Provisioning with Terraform
-
-This section involves using Terraform to set up the necessary AWS infrastructure, including VPCs, subnets, EC2 instances, and CloudWatch monitoring.
-
-For detailed information on the Terraform configuration, refer to the [Terraform README](Terraform/README.md).
-
-### 2. Configuration Management with Ansible
-
-Ansible is used to install and configure necessary packages on the EC2 instances provisioned by Terraform.
-
-For detailed information on the Ansible setup, refer to the [Ansible README](Ansible/README.md).
-
-### 3. Application Deployment on OpenShift
-
-This section includes the deployment and service configurations necessary to deploy the application on an OpenShift cluster.
-
-For detailed information on the OpenShift deployment, refer to the [OpenShift README](openshift/README.md).
-
-### 4. Continuous Integration with Jenkins
-
-The Jenkinsfile defines the pipeline stages for building, testing, and deploying the application. It also uses a shared library for reusable functions.
-
-For detailed information on the Jenkins pipeline, refer to the [Jenkins README](jenkins/README.md).
+Certainly! Here is a step-by-step guide to creating an automated deployment pipeline on Jenkins using a Jenkinsfile. The pipeline will include stages for Git checkout, running unit tests, compiling code, running SonarQube analysis, building a Docker image, pushing the Docker image to a registry, and deploying the application on OpenShift.
 
 
+## Introduction
+
+This guide provides detailed instructions on setting up an automated deployment pipeline on Jenkins. The pipeline includes stages for:
+- Git Checkout
+- Running Unit Tests
+- Code Compilation
+- SonarQube Analysis
+- Building Docker Image
+- Pushing Docker Image
+- Deploying on OpenShift
+
+## Prerequisites
+
+Before setting up the pipeline, ensure you have the following:
+1. Jenkins installed and running.
+2. Required plugins installed on Jenkins: (**which installed by ansible in Configuration Managment [Ansible README](Ansible/README.md) for your review** )
+   - Git Plugin
+   - Pipeline Plugin
+   - Docker Pipeline Plugin
+   - SonarQube Plugin
+3. A configured SonarQube server.
+4. Docker installed and configured on Jenkins.
+5. Access to a Docker registry (e.g., Docker Hub).
+6. OpenShift cluster with appropriate permissions.
+
+## Steps to Configure the Pipeline
+
+### 1. Install Required Jenkins Plugins
+
+Ensure the following plugins are installed on your Jenkins instance:
+- Git Plugin
+- Pipeline Plugin
+- Docker Pipeline Plugin
+- SonarQube Plugin
+
+### 2. Configure SonarQube in Jenkins
+
+1. Go to Jenkins Dashboard.
+2. Click on "Manage Jenkins" > "Configure System".
+3. Scroll down to "SonarQube servers" and click on "Add SonarQube".
+4. Add your SonarQube server details and authentication token.
+
+![alt text](screenshots/sonarQubeInstallation.png)
+
+![alt text](screenshots/sonar_token.png)
 
 
-## Infrastructure Provisioning with Terraform
-### Task
-- Deliver Terraform scripts for AWS resource provisioning:
-  - VPC, Subnets, Security Groups.
-  - EC2 instances for application deployment.
+### 3. Create Jenkins Credentials
 
-### Deliverables
-- Terraform scripts committed to the repository.
-- Use Terraform Modules.
+1. Go to Jenkins Dashboard.
+2. Click on "Manage Jenkins" > "Manage Credentials".
+3. Add credentials for:
+   - Docker Registry (username and password).
+   - AWS (Access Key and Secret Key) if deploying on AWS.
+   - OpenShift (token if required).
+  
+  ![alt text](screenshots/credentials.png)
 
-#### Example Terraform Script
-```hcl
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "2.77.0"
+### 4. Configure Shared Library in Jenkins
 
-  name = "multi-cloud-vpc"
-  cidr = "10.0.0.0/16"
+1. Go to Jenkins Dashboard.
+2. Click on "Manage Jenkins" > "Configure System".
+3. Scroll down to "Global Pipeline Libraries" and click on "Add".
+4. Enter the following details:
+   - Name: `shared_library`
+   - Default version: `main` (or the default branch of your shared library)
+   - Retrieval method: Modern SCM
+   - Select "Git" and provide the repository URL of your shared library: https://github.com/your-username/your-shared-library-repo.git.
+   - Add credentials if required.
+5. Click "Save".
 
-  azs             = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+![alt text](screenshots/shared_library1.png)
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+![alt text](screenshots/shared_library2.png)
 
-  tags = {
-    Terraform   = "true"
-    Environment = "dev"
-  }
-}
+### 5. Create a Jenkins Pipeline Job
 
-module "ec2_instances" {
-  source          = "./modules/ec2"
-  instance_count  = 2
-  instance_type   = "t2.micro"
-  key_name        = "my-key"
-  vpc_id          = module.vpc.vpc_id
-  subnet_id       = element(module.vpc.public_subnets, 0)
-  security_groups = [module.security_group.this_security_group_id]
-}
-```
+1. Go to Jenkins Dashboard.
+2. Click on "New Item".
+3. Enter the job name and select "Pipeline".
+4. Click "OK" to create the job.
 
-## Configuration Management with Ansible
-### Task
-- Deliver Ansible playbooks for EC2 instance configuration:
-  - Install the required packages (e.g., Git, Docker, Java).
-  - Install the required packages for Jenkins.
-  - Install the required packages for SonarQube.
-  - Set up necessary environment variables.
 
-### Deliverables
-- Ansible playbooks committed to the repository.
-- Use Ansible roles.
+### 6. Configure Jenkinsfile in Your Repository
 
-#### Example Ansible Playbook
-```yaml
-- name: Install packages
-  hosts: all
-  become: yes
-  roles:
-    - common
-    - jenkins
-    - sonarqube
-
-# roles/common/tasks/main.yml
-- name: Install basic packages
-  apt:
-    name:
-      - git
-      - docker.io
-      - openjdk-11-jdk
-    state: present
-
-# roles/jenkins/tasks/main.yml
-- name: Install Jenkins
-  apt:
-    name: jenkins
-    state: present
-
-# roles/sonarqube/tasks/main.yml
-- name: Install SonarQube
-  apt:
-    name: sonarqube
-    state: present
-```
-
-## Containerization with Docker
-### Task
-- Deliver Dockerfile for building the application image.
-
-### Deliverables
-- Dockerfile committed to the repository.
-
-#### Example Dockerfile
-```dockerfile
-FROM openjdk:11-jre-slim
-WORKDIR /app
-COPY . /app
-RUN ./gradlew build
-CMD ["java", "-jar", "build/libs/demo.jar"]
-```
-
-## Continuous Integration with Jenkins
-### Task
-- Deliver Jenkins job configuration instructions for building Docker image on code commits.
-
-### Deliverables
-- Jenkins job instructions for the configuration.
-
-#### Example Jenkinsfile
-```groovy
-pipeline {
-    agent any
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'dev', credentialsId: 'GitHub', url: 'https://github.com/Osamaomera/MultiCloudDevOpsProject.git'
-            }
-        }
-        stage('Build') {
-            steps {
-                sh './gradlew build'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh './gradlew test'
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("myapp:${env.BUILD_ID}")
-                }
-            }
-        }
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerHubCredentialsID') {
-                        docker.image("myapp:${env.BUILD_ID}").push()
-                    }
-                }
-            }
-        }
-    }
-}
-```
-
-## Automated Deployment Pipeline
-### Task
-- Deliver Jenkins pipeline configuration in Jenkinsfile:
-  - Stages: Git Checkout, Build, Unit Test, SonarQube Test, Deploy on OpenShift.
-  - Use Shared Jenkins Library.
-
-#### Example Jenkinsfile with Shared Library
 ```groovy
 @Library('shared_library')_
 pipeline {
+    
     agent any
+    
+    tools {
+        jdk 'jdk-17'
+        maven 'maven'
+    }
+
+    environment {
+        SCANNER_HOME                = tool 'sonar-scanner'
+        dockerHubCredentialsID	    = 'DockerHub'  		    			                   // DockerHub credentials ID.
+	    imageName                   = 'osayman74/ivolve-website'                           // DockerHub repo/image_name.
+        openshiftCredentialsID	    = 'OpenShift'		    			                   // service account token credentials ID or KubeConfig credentials ID.      = 	    				                         // OC credentials ID.
+        openshiftClusterURL	        = 'https://api.ocp-training.ivolve-test.com:6443'      // OpenShift Cluser URL.
+        openshifProject 	        = 'osamaayman'			     			               // OpenShift project name.    
+    }
+
+    triggers {
+        githubPush() // Trigger pipeline on GitHub push events
+    }
+    
     stages {
-        stage('Checkout') {
+                        
+        stage('Repo Checkout') {
             steps {
-                checkoutRepo()
+            	script {
+                	checkoutRepo
+                }
             }
         }
-        stage('Build') {
+
+        stage('Run Unit Test') {
             steps {
-                runUnitTests()
-            }
-        }
-        stage('SonarQube Analysis') {
+                script {
+                	// Navigate to the directory contains the Application
+                	dir('App') {
+                		runUnitTests
+            		}
+        	   }
+    	    }
+	    }
+
+        stage('Run Code Compile') {
             steps {
-                runSonarQubeAnalysis()
+                script {
+                	// Navigate to the directory contains the Application
+                	dir('App') {
+                		codeCompile
+            		}
+        	    }
+    	    }
+	    }
+	
+        stage('Run SonarQube Analysis') {
+            steps {
+                script {
+                    	// Navigate to the directory contains the Application
+                    	dir('app') {
+                    		runSonarQubeAnalysis()
+                    	}
+                    }
+                }
             }
-        }
+
         stage('Build Docker Image') {
             steps {
-                buildDockerImage()
+                script {
+                	// Navigate to the directory contains Dockerfile
+                 	dir('app') {
+                 		buildDockerImage("${dockerHubCredentialsID}", "${imageName}")
+                        
+                    	}
+                    }
+                }
             }
-        }
+
         stage('Push Docker Image') {
             steps {
-                pushDockerImage()
+                script {
+                	// Navigate to the directory contains Dockerfile
+                 	dir('app') {
+                 		pushDockerImage("${dockerHubCredentialsID}", "${imageName}")
+                        
+                    	}
+                }
             }
         }
-        stage('Deploy to OpenShift') {
+
+        stage('Deploy on OpenShift Cluster') {
             steps {
-                deployToOpenShift()
+                script { 
+                        // Navigate to the directory contains OpenShift YAML files
+                	dir('OpenShift') {
+				deployOnOpenShift("${openshiftCredentialsID}", "${openshiftClusterURL}", "${openshifProject}", "${imageName}")
+                    	}
+                }
             }
+        }
+    }
+
+post {
+        success {
+            echo "${JOB_NAME}-${BUILD_NUMBER} pipeline succeeded"
+        }
+        failure {
+            echo "${JOB_NAME}-${BUILD_NUMBER} pipeline failed"
         }
     }
 }
 ```
 
-## Monitoring and Logging
-### Task
-- Deliver setup instructions for centralized logging on OpenShift for container logs.
+Add a `Jenkinsfile` to the root of your repository with the above pipeline script.
 
-## Overview
+### 8. Trigger the Pipeline
 
-This guide explains how to set up Kubernetes monitoring using Prometheus and Grafana in an EKS cluster using Helm charts. This setup includes Prometheus for collecting and storing metrics data, Alert Manager for sending alerts, and Grafana for visualizing the metrics in a UI.
+1. Go to the Jenkins job you created.
+2. Click on "Build Now" to trigger the pipeline.
+3. Monitor the pipeline execution through the Jenkins dashboard.
 
-### Key Components
+![alt text](screenshots/pipline1.png)
 
-1. **Prometheus Server:** Processes and stores metrics data.
-2. **Alert Manager:** Sends alerts to various systems/channels.
-3. **Grafana:** Visualizes scraped data in a user-friendly UI.
+![alt text](screenshots/pipeline3.png)
 
-### Installation Method
+### Check the SonarQube for Code 
 
-We recommend using Helm charts for a streamlined installation process. Helm is a package manager for Kubernetes that simplifies the deployment of complex systems like Prometheus and Grafana.
+![alt text](screenshots/sonarqube1.png)
 
-### Prerequisites
+![alt text](screenshots/sonarqube2.png)
 
-- EKS Cluster up and running
-- Helm3 installed
-- EC2 instance to access the EKS cluster
+### The App Deployed in OpenShift
 
-## Implementation Steps
+![alt text](screenshots/oc1.png)
 
-### Add Helm Repositories
+### Access the App Url in Route
 
-```bash
-helm repo add stable https://charts.helm.sh/stable
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-```
-
-### Create Prometheus Namespace
-
-```bash
-kubectl create namespace prometheus
-```
-
-### Install kube-prometheus-stack
-
-```bash
-helm install stable prometheus-community/kube-prometheus-stack -n prometheus
-```
-
-Verify the installation:
-
-```bash
-kubectl get pods -n prometheus
-kubectl get svc -n prometheus
-```
-
-### Access Grafana UI
-
-Get the Load Balancer URL:
-
-```bash
-kubectl get svc -n prometheus
-```
-
-Access Grafana UI in your browser using the Load Balancer URL:
-
-- URL: [Grafana URL]
-- Username: admin
-- Password: prom-operator
-
-### Create Dashboards in Grafana
-
-1. **Kubernetes Monitoring Dashboard:**
-   - Click '+' on the left panel and select ‘Import’.
-   - Enter the dashboard ID 12740 from Grafana.com Dashboard.
-   - Select ‘Prometheus’ as the data source.
-   - Click ‘Import’.
-
-2. **Kubernetes Cluster Monitoring Dashboard:**
-   - Click '+' on the left panel and select ‘Import’.
-   - Enter the dashboard ID 3119 from Grafana.com Dashboard.
-   - Select ‘Prometheus’ as the data source.
-   - Click ‘Import’.
-
-3. **POD Monitoring Dashboard:**
-   - Click '+' on the left panel and select ‘Import’.
-   - Enter the dashboard ID 6417 from Grafana.com Dashboard.
-   - Select ‘Prometheus’ as the data source.
-   - Click ‘Import’.
-
-
-### Deliverables
-- Instructions for setting up centralized logging.
-
-#### Example Logging Setup Instructions
-1. Install EFK (Elasticsearch, Fluentd, Kibana) stack on OpenShift.
-2. Configure Fluentd to collect logs from the application containers.
-3. Set up Kibana dashboards to visualize the logs.
+![alt text](screenshots/oc2.png)
 
 ## AWS Integration
+
 ### Task
 - Provide instructions for integrating AWS services:
   - Use S3 Terraform Backend state.
+  - Use DynamoDB Terraform Lock state
   - Integrate CloudWatch for monitoring.
 
 ### Deliverables
 - Instructions for AWS integration in the Terraform Code.
 
-#### Example AWS Integration Instructions
-1. Configure S3 backend in Terraform:
-    ```hcl
-    terraform {
-      backend "s3" {
-        bucket = "my-terraform-state"
-        key    = "path/to/my/key"
-        region = "us-east-1"
-      }
-    }
-    ```
-2. Integrate CloudWatch in Terraform:
-    ```hcl
-    resource "aws_cloudwatch_log_group" "example" {
-      name = "example-log-group"
-      retention_in_days = 14
-    }
-    ```
+- **S3 Backend State**
+![alt text](screenshots/s3.png)
 
-## Documentation
-### Task
-- Deliver comprehensive documentation:
-  - Setup instructions.
-  - Architecture overview.
-  - Troubleshooting guidelines.
+- **DynamoDB Lock State**
+![alt text](screenshots/DynamoDB.png)
+![alt text](screenshots/DynamoDB1.png)
 
-### Deliverables
-- Documentation is available in the repository.
+- **Cloud Watch for Monitoring Ec2** 
+![alt text](screenshots/cloud_watch_dashboard.png)
+![alt text](screenshots/cloud_watch1.png)
+![alt text](screenshots/cloud_watch3.png)
+![alt text](screenshots/sns.png)
 
-#### Example Documentation Sections
-1. **Setup Instructions**
-    - Clone the repository.
-    - Follow the instructions to set up the infrastructure using Terraform.
-    - Use Ansible playbooks to configure the EC2 instances.
-    - Build and push the Docker image using Jenkins.
-    - Deploy the application to OpenShift.
+## Running the Automated Deployment Script
 
-2. **Architecture Overview**
-    - Description of the infrastructure components (VPC, subnets, EC2 instances, security groups).
-    - Explanation of the CI/CD pipeline stages.
-    - Overview of the monitoring and logging setup.
+This script automates the entire process of provisioning infrastructure with Terraform, updating the Ansible inventory, and running the Ansible playbook. It will then show the output of the deployed website on OpenShift.
 
-3. **Troubleshooting Guidelines**
-    - Common issues and their solutions.
-    - Links to relevant documentation and resources.
+### Script: `run.sh`
+
+```bash
+#!/bin/bash
+
+# Script to run Terraform, update Ansible inventory with EC2 IP, then run Ansible playbook
+
+# Set the paths to Terraform and Ansible directories
+terraform_dir="/home/osamaayman/Documents/MultiCloudDevOpsProject/Terraform"
+ansible_dir="/home/osamaayman/Documents/MultiCloudDevOpsProject/Ansible"
+inventory_file="$ansible_dir/inventory.txt"
+private_key_file="/home/osamaayman/.ssh/jenkins-ec2"
+
+# Function to check for necessary tools
+check_tools() {
+    command -v terraform >/dev/null 2>&1 || { echo "Terraform is required but it's not installed. Aborting."; exit 1; }
+    command -v ansible-playbook >/dev/null 2>&1 || { echo "Ansible is required but it's not installed. Aborting."; exit 1; }
+}
+
+# Function to run Terraform
+run_terraform() {
+    cd "$terraform_dir" || { echo "Failed to navigate to Terraform directory. Aborting."; exit 1; }
+    echo "Running Terraform in $terraform_dir"
+    terraform init
+    terraform apply -auto-approve
+    echo "Terraform execution completed."
+}
+
+# Function to update the Ansible inventory file with the EC2 IP
+update_inventory() {
+    echo "Updating Ansible inventory file"
+    cd "$terraform_dir" || { echo "Failed to navigate to Terraform directory. Aborting."; exit 1; }
+    ip_address=$(cat ec2-ip.txt)
+    if [ -z "$ip_address" ]; then
+        echo "No IP address found in ec2-ip.txt. Aborting."
+        exit 1
+    fi
+    echo -e "jenkins-ec2 ansible_host=${ip_address} ansible_user=ubuntu ansible_ssh_private_key_file=${private_key_file}" > "$inventory_file"
+    echo "ansible_host is updated in inventory file."
+}
+
+# Function to clean ec2-ip.txt
+clean_ec2_ip() {
+    cd "$terraform_dir" || { echo "Failed to navigate to Terraform directory. Aborting."; exit 1; }
+    echo "" > ec2-ip.txt
+}
+
+# Function to run the Ansible playbook
+run_ansible() {
+    cd "$ansible_dir" || { echo "Failed to navigate to Ansible directory. Aborting."; exit 1; }
+    echo "Running Ansible playbook in $ansible_dir"
+    export ANSIBLE_HOST_KEY_CHECKING=False
+    ansible-playbook -i inventory.txt playbook.yml --ask-vault-pass
+    echo "Ansible execution completed."
+}
+
+# Main script execution
+check_tools
+run_terraform
+update_inventory
+clean_ec2_ip
+run_ansible
+```
+
+### Steps to Run the Script
+
+1. **Save the Script**:
+   Save the script above to a file named `run.sh`.
+
+2. **Make the Script Executable**:
+   ```sh
+   chmod +x run.sh
+   ```
+
+3. **Run the Script**:
+   ```sh
+   ./run.sh
+   ```
+  ![alt text](screenshots/runsh1.png)
+  ![alt text](screenshots/runsh2.png)
+  ![alt text](screenshots/runsh3.png)
+  ![alt text](screenshots/runsh4.png)
+  ![alt text](screenshots/runsh5.png)
+  ![alt text](screenshots/runsh6.png)
+  ![alt text](screenshots/runsh7.png)
+
+### Output Verification
+
+**After running the script, And After Jenkins Pipeline Finished** 
+verify the output of the deployed website on OpenShift by accessing the application's URL which in route . The steps involved include:
+
+1. **Access the OpenShift Console**:
+   Navigate to your OpenShift web console and log in.
+![alt text](screenshots/oc6.png)
+
+![alt text](screenshots/oc3.png)
+
+![alt text](screenshots/oc4.png)
+2. **Find the Route**:
+   In your OpenShift project, locate the route created for your application. This will be in the `Networking > Routes` section.
+
+   ![alt text](screenshots/oc5.png)
+
+3. **Open the Application URL**:
+   Copy the URL provided in the route and paste it into your web browser to access the deployed application.
+
+   ![alt text](screenshots/oc2.png)
+
 
 ## Troubleshooting
+
 ### Common Issues
 - **Disk Space Issues**: Ensure there is sufficient disk space on the Jenkins server.
 - **Network Issues**: Verify network connectivity between the Jenkins server and the GitHub repository, Docker registry, and OpenShift cluster.
 - **Permission Issues**: Check the permissions and credentials used for accessing AWS, DockerHub, and OpenShift.
 
 ### Useful Commands
-- **Terraform Commands**:
-  - `terraform init`: Initialize the Terraform configuration.
-  - `terraform apply`: Apply the Terraform configuration to provision resources.
-- **Ansible Commands**:
-  - `ansible-playbook -i inventory playbook.yml`: Run an Ansible playbook.
-- **Docker Commands**:
-  - `docker build -t myapp .`: Build a Docker image.
-  - `docker push myapp`: Push a Docker image to the registry.
-- **Jenkins Commands**:
- 
- ### Refrences 
 
-https://www.coachdevops.com/2022/05/how-to-setup-monitoring-on-kubernetes.html
+Here are the useful commands for each tool used in this project, including Terraform, Ansible, Docker, and Jenkins.
+
+#### Terraform Commands
+- `terraform init`: Initialize the Terraform configuration.
+- `terraform apply --auto-approve`: Apply the Terraform configuration to provision resources.
+- `terraform destroy --auto-approve`: Destroy the Terraform-managed infrastructure.
+
+#### Ansible Commands
+- `ansible-playbook -i inventory playbook.yml`: Run an Ansible playbook.
+- `ansible-inventory -i inventory --list`: List inventory hosts and variables.
+- `ansible-vault encrypt playbook.yml`: Encrypt an Ansible playbook.
+- `ansible-vault decrypt playbook.yml`: Decrypt an Ansible playbook.
+- `ansible-vault view playbook.yml`: View an encrypted Ansible playbook.
+
+#### Docker Commands
+- `docker build -t myapp .`: Build a Docker image.
+- `docker push myapp`: Push a Docker image to the registry.
+- `docker run -p 8080:8080 myapp`: Run a Docker container from an image.
+- `docker login`: Log in to a Docker registry.
+- `docker tag myapp:latest myapp:v1.0.0`: Tag a Docker image.
+
+#### OpenShift Commands
+- `oc apply -f deployment.yml`: Apply a Kubernetes deployment configuration.
+- `oc get pods`: List all pods in the Kubernetes cluster.
+- `oc get services`: List all services in the Kubernetes cluster.
+- `oc describe pod <pod-name>`: Describe a specific pod.
+- `oc logs <pod-name>`: Fetch the logs of a pod.
+
+### Setting Up and Running the Pipeline
+
+#### 1. Setting Up Terraform
+```sh
+# Navigate to the Terraform directory
+cd /home/osamaayman/Documents/MultiCloudDevOpsProject/Terraform
+
+# Initialize the Terraform configuration
+terraform init
+
+# Apply the Terraform configuration to provision resources
+terraform apply --auto-approve
+```
+
+#### 2. Updating Ansible Inventory
+```sh
+# Extract the EC2 IP address and update the inventory file
+ip_address=$(cat ec2-ip.txt)
+echo -e "jenkins-ec2 ansible_host=${ip_address} ansible_user=ubuntu ansible_ssh_private_key_file=/path/to/your/private/key.pem" > /home/osamaayman/Documents/MultiCloudDevOpsProject/Ansible/inventory.txt
+```
+
+#### 3. Running Ansible Playbook
+```sh
+# Navigate to the Ansible directory
+cd /home/osamaayman/Documents/MultiCloudDevOpsProject/Ansible
+
+# Run the Ansible playbook
+ansible-playbook -i inventory.txt playbook.yml --ask-vault-pass
+```
+
+#### 4. Docker Commands
+```sh
+# Build the Docker image
+docker build -t myapp .
+
+# Push the Docker image to the registry
+docker push myapp
+```
 
 ## Documentation 
 

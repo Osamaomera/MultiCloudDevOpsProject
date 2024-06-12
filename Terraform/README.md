@@ -128,25 +128,37 @@ module "cloudwatch" {
 
 ### Steps
 
-1. **Initialize the Terraform configuration:**
-   ```sh
-   terraform init
-   ```
+1. **Navigate to the Terraform Directory**:
+```bash
+   cd Terraform
+```
+2. **Initialize Terraform**:
+```bash
+  terraform init
+```
+![alt text](../screenshots/terraform1.png)
 
-2. **Plan the Terraform deployment:**
-   ```sh
-   terraform plan
-   ```
+3. **Provide AWS Credentials**:
 
-3. **Apply the Terraform configuration:**
-   ```sh
-   terraform apply
-   ```
+Ensure that AWS credentials are configured either through environment variables or AWS shared credentials file.
 
-4. **Destroy the Terraform infrastructure (when no longer needed):**
-   ```sh
-   terraform destroy
-   ```
+4. **Apply Infrastructure Changes**:
+
+```bash
+terraform apply -auto-approve
+```
+![alt text](../screenshots/terraform.png)
+
+
+### S3 and DynamoDB
+
+![alt text](../screenshots/s3.png)
+
+![alt text](../screenshots/DynamoDB.png)
+
+5. **Destroy Infrastrucure After Finish**
+
+![alt text](../screenshots/terraform_destroy.png)
 
 ## Variables
 
@@ -193,16 +205,3 @@ module "cloudwatch" {
 
 - `cloudwatch_dashboard_url`: The URL of the CloudWatch dashboard.
 - `cloudwatch_alarms`: The created CloudWatch alarms.
-
-## ScreenShots
-
-![alt text](../screenshots/terraform1.png)
-
-![alt text](../screenshots/terraform.png)
-
-![alt text](../screenshots/terraform_destroy.png)
-
-![alt text](../screenshots/s3.png)
-
-![alt text](../screenshots/DynamoDB.png)
-
