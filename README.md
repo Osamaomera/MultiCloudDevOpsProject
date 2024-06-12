@@ -222,7 +222,8 @@ This guide provides detailed instructions on setting up an automated deployment 
 
 Before setting up the pipeline, ensure you have the following:
 1. Jenkins installed and running.
-2. Required plugins installed on Jenkins: (**which installed by ansible in Configuration Managment [Ansible README](Ansible/README.md) for your review** )
+2. Required plugins installed on Jenkins: 
+(**which installed by ansible in Configuration Managment [Ansible README](Ansible/README.md) for your review** )
    - Git Plugin
    - Pipeline Plugin
    - Docker Pipeline Plugin
