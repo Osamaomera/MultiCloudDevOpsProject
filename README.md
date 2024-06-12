@@ -1,31 +1,215 @@
 # MultiCloudDevOpsProject
 
+This project demonstrates a comprehensive DevOps pipeline that integrates Terraform for infrastructure provisioning, Ansible for configuration management, Docker for containerization, Jenkins for continuous integration, and OpenShift for deployment. The pipeline automates the deployment of a sample application to OpenShift, ensuring a streamlined and efficient workflow. Additionally, it integrates monitoring and logging, as well as AWS services.
+
+## Project Archticture 
+
+![alt text](screenshots/final_project.drawio.svg)
+
+
+## Project Structure
+```
+├── Ansible
+├── app
+├── OpenShift
+├── screenshots
+├── scripts
+├── Terraform
+├── jenkinsfile
+└── README.md
+```
 ## Table of Contents
-- [Project Overview](#project-overview)
-- [GitHub Repository Setup](#github-repository-setup)
-- [Infrastructure Provisioning with Terraform](#infrastructure-provisioning-with-terraform)
-- [Configuration Management with Ansible](#configuration-management-with-ansible)
-- [Containerization with Docker](#containerization-with-docker)
-- [Continuous Integration with Jenkins](#continuous-integration-with-jenkins)
-- [Automated Deployment Pipeline](#automated-deployment-pipeline)
-- [Monitoring and Logging](#monitoring-and-logging)
-- [AWS Integration](#aws-integration)
-- [Documentation](#documentation)
-- [Troubleshooting](#troubleshooting)
 
-## Project Overview
-The MultiCloudDevOpsProject is designed to demonstrate the integration of various DevOps tools and practices, including infrastructure provisioning with Terraform, configuration management with Ansible, containerization with Docker, continuous integration and deployment with Jenkins, and monitoring and logging on OpenShift, all within an AWS environment.
+1. [Project Setup](#project-setup)
+2. [Infrastructure Provisioning](#infrastructure-provisioning)
+3. [Configuration Management](#configuration-management)
+4. [Containerization](#containerization)
+5. [Continuous Integration](#continuous-integration)
+6. [Automated Deployment Pipeline](#automated-deployment-pipeline)
+7. [Monitoring and Logging](#monitoring-and-logging)
+8. [AWS Integration](#aws-integration)
+9. [Documentation](#documentation)
 
-## GitHub Repository Setup
+## Prerequisites
+Before using this project, ensure that you have the following prerequisites:
+
+- Docker: For building and managing containerized applications.
+- Kubernetes/OpenShift: For orchestrating containerized applications.
+- Jenkins: For implementing continuous integration and continuous deployment (CI/CD) pipelines.
+- Docker Hub Account: For storing Docker images.
+- Git: For version control and cloning the project repository.
+
+
+## Repository Setup
+
+### Initial Configuration
+
+1. **Create and Clone the Repository:**
+   - Create a new repository named "MultiCloudDevOpsProject" on GitHub.
+   - Clone the repository to your local machine to get started:
+     ```
+     git clone https://github.com/Osamaomera/MultiCloudDevOpsProject.git
+     ```
+
+2. **Branching:**
+   - **Main Branch:** Contains the production-ready code.
+   - **Dev Branch:** Used for ongoing development work.
+  
+3. **Branch Creation:**
+   - Create a development branch named `dev` for ongoing changes:
+     ```
+     git checkout -b dev
+     git push origin dev
+     ```
+
+By following these steps, you'll have a structured repository for your DevOps project, with separate branches for development and production-ready code.
+
+
+## Infrastructure Provisioning
+
+The infrastructure for this project is provisioned using Terraform. It includes the following modules:
+
+- EC2 Module
+- VPC Module
+- Subnet Module
+- CloudWatch Module
+
+This setup provisions an EC2 instance to run Jenkins, which will be used for pipeline execution.
+
+For detailed information, refer to the [Terraform README](terraform/README.md).
+
+## Configuration Management
+
+Configuration management is handled by Ansible. The playbooks configure the EC2 instance by installing the required software and setting up necessary environment variables. The roles included are:
+
+- `packages` role for prerequisites like `oc cli`, `jdk`, and `maven`
+- `git` role
+- `postgres` role for SonarQube
+- `sonarqube` role
+- `jenkins` role
+- `docker` role
+
+For detailed information, refer to the [Ansible README](ansible/README.md).
+
+## Containerization
+
+Containerization plays a crucial role in this project's architecture, facilitating efficient deployment and management of applications. Docker is the primary tool used for containerization. Below are the key components and tasks related to containerization:
+
+- **Dockerfile:**
+  - A Dockerfile is provided to build the application image. It includes instructions on how to package the application and its dependencies into a Docker container.
+
+- **Image Repository:**
+  - The Docker image is pushed to a container registry, such as Docker Hub or a private registry, for storage and distribution.
+
+- **Container Deployment:**
+  - The Docker image is deployed as containers on the target environment, ensuring consistent and isolated execution of the application.
+
+
+## Configuration Management
+
+Configuration management for this project is orchestrated by Ansible. The playbooks are responsible for configuring the EC2 instance, installing essential software, and setting up crucial environment variables. Below are the roles included in the configuration management process:
+
+- **Packages Role:**
+  - Installs prerequisites such as `oc cli`, `jdk`, and `maven` needed for the project.
+
+- **Git Role:**
+  - Handles the installation and configuration of Git on the target system.
+
+- **Postgres Role for SonarQube:**
+  - Sets up PostgreSQL for SonarQube, including user creation and database setup.
+
+- **SonarQube Role:**
+  - Configures SonarQube on the EC2 instance, ensuring it's ready for code analysis.
+
+- **Jenkins Role:**
+  - Installs and configures Jenkins on the EC2 instance to facilitate continuous integration and deployment.
+
+- **Docker Role:**
+  - Manages the installation and setup of Docker, enabling containerization within the environment.
+
+For a more comprehensive understanding of each role and its tasks, please refer to the [Ansible README](ansible/README.md).
+
+## Automated Deployment Pipeline
+
 ### Task
-- Create a new GitHub repository named "MultiCloudDevOpsProject."
-- Initialize the repository with a README.
-- Create main and dev branches.
-- Push all the code to the dev branch.
-- Create a pull request to merge to the main branch before delivering the project.
+- Deliver Jenkins pipeline configuration in Jenkinsfile with stages:
+  - Git Checkout
+  - Build
+  - Unit Test
+  - SonarQube Test
+  - Deploy on OpenShift
 
 ### Deliverables
-- [URL to the GitHub repository](#)
+- Jenkins pipeline configured in the Jenkinsfile.
+
+## Monitoring and Logging
+
+### Task
+- Deliver setup instructions for centralized logging on OpenShift for container logs.
+
+### Deliverables
+- Instructions for setting up centralized logging.
+
+## AWS Integration
+
+### Task
+- Provide instructions for integrating AWS services:
+  - Use S3 Terraform Backend state.
+  - Integrate CloudWatch for monitoring.
+
+### Deliverables
+- Instructions for AWS integration in the Terraform Code.
+
+## Documentation
+
+### Task
+- Deliver comprehensive documentation:
+  - Setup instructions.
+  - Architecture overview.
+  - Troubleshooting guidelines.
+
+### Deliverables
+- Documentation is available in the repository.
+
+---
+
+This README provides an overview and serves as a navigation guide for the different components of the project. Each section is linked to the respective detailed documentation for in-depth information.
+
+## Project Structure
+
+1. **Terraform**: Provisioning AWS infrastructure.
+2. **Ansible**: Configuring the EC2 instances.
+3. **OpenShift**: Deploying the application.
+4. **Jenkins**: Managing the CI/CD pipeline.
+
+## Sections
+
+### 1. Infrastructure Provisioning with Terraform
+
+This section involves using Terraform to set up the necessary AWS infrastructure, including VPCs, subnets, EC2 instances, and CloudWatch monitoring.
+
+For detailed information on the Terraform configuration, refer to the [Terraform README](Terraform/README.md).
+
+### 2. Configuration Management with Ansible
+
+Ansible is used to install and configure necessary packages on the EC2 instances provisioned by Terraform.
+
+For detailed information on the Ansible setup, refer to the [Ansible README](Ansible/README.md).
+
+### 3. Application Deployment on OpenShift
+
+This section includes the deployment and service configurations necessary to deploy the application on an OpenShift cluster.
+
+For detailed information on the OpenShift deployment, refer to the [OpenShift README](openshift/README.md).
+
+### 4. Continuous Integration with Jenkins
+
+The Jenkinsfile defines the pipeline stages for building, testing, and deploying the application. It also uses a shared library for reusable functions.
+
+For detailed information on the Jenkins pipeline, refer to the [Jenkins README](jenkins/README.md).
+
+
+
 
 ## Infrastructure Provisioning with Terraform
 ### Task
@@ -182,9 +366,6 @@ pipeline {
 - Deliver Jenkins pipeline configuration in Jenkinsfile:
   - Stages: Git Checkout, Build, Unit Test, SonarQube Test, Deploy on OpenShift.
   - Use Shared Jenkins Library.
-
-### Deliverables
-- Jenkins pipeline configured in the Jenkinsfile.
 
 #### Example Jenkinsfile with Shared Library
 ```groovy
@@ -396,3 +577,16 @@ Access Grafana UI in your browser using the Load Balancer URL:
  ### Refrences 
 
 https://www.coachdevops.com/2022/05/how-to-setup-monitoring-on-kubernetes.html
+
+## Documentation 
+
+| Resource                         | Link                                                                                       |
+|----------------------------------|--------------------------------------------------------------------------------------------|
+| Ansible Documentation            | [Ansible Documentation](https://docs.ansible.com/)                                         |
+| Ansible Galaxy                   | [Ansible Galaxy](https://galaxy.ansible.com/)                                              |
+| Jenkins Documentation            | [Jenkins Documentation](https://www.jenkins.io/doc/)                                       |
+| Docker Documentation             | [Docker Documentation](https://docs.docker.com/)                                           |
+| Terraform Documentation          | [Terraform Documentation](https://www.terraform.io/docs/index.html)                        |
+| SonarQube Documentation          | [SonarQube Documentation](https://docs.sonarqube.org/latest/)                               |
+| OpenShift CLI Documentation      | [OpenShift CLI Documentation](https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html) |
+| AWS EC2 Documentation            | [AWS EC2 Documentation](https://docs.aws.amazon.com/ec2/index.html)                        |
