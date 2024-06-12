@@ -290,11 +290,11 @@ Ensure the following plugins are installed on your Jenkins instance:
 4. Click "OK" to create the job.
 
 ### WebHook in Github
-![alt text](webhook1.png)
+![alt text](screenshots/webhook1.png)
 
-![alt text](webhook2.png)
+![alt text](screenshots/webhook2.png)
 
-![alt text](trriger.png)
+![alt text](screenshots/trriger.png)
 
 ### 6. Configure Jenkinsfile in Your Repository
 
@@ -464,8 +464,8 @@ Add a `Jenkinsfile` to the root of your repository with the above pipeline scrip
 ![alt text](screenshots/cloud_watch_dashboard.png)
 ![alt text](screenshots/cloud_watch1.png)
 ![alt text](screenshots/cloud_watch3.png)
-![alt text](topic1.png)
-![alt text](topic2.png)
+![alt text](screenshots/topic1.png)
+![alt text](screenshots/topic2.png)
 ![alt text](screenshots/sns.png)
 
 ## Running the Automated Deployment Script
