@@ -4,7 +4,7 @@ This project demonstrates a comprehensive DevOps pipeline that integrates Terraf
 
 ## Project Archticture 
 
-![alt text](screenshots/final_shape.svg)
+![alt text](screenshots/final.svg)
 
 
 ## Project Structure
