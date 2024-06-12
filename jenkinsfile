@@ -10,9 +10,11 @@ pipeline {
 
     environment {
         SCANNER_HOME                = tool 'sonar-scanner'
-        dockerHubCredentialsID	    = 'DockerHub'  		    			         // DockerHub credentials ID.
-	    imageName                   = 'osayman74/spot'                           // DockerHub repo/image_name.
-        k8sCredentialsID	        = 'k8s'	    				                     // KubeConfig credentials ID.
+        dockerHubCredentialsID	    = 'DockerHub'  		    			                   // DockerHub credentials ID.
+	    imageName                   = 'osayman74/ivolve-website'                           // DockerHub repo/image_name.
+        openshiftCredentialsID	    = 'OpenShift'		    			                   // service account token credentials ID or KubeConfig credentials ID.      = 	    				                         // OC credentials ID.
+        openshiftClusterURL	        = 'https://api.ocp-training.ivolve-test.com:6443'      // OpenShift Cluser URL.
+        openshifProject 	        = 'osamaayman'			     			               // OpenShift project name.    
     }
 
     triggers {
@@ -86,16 +88,16 @@ pipeline {
             }
         }
 
-        // stage('Deploy on OpenShift Cluster') {
-        //     steps {
-        //         script { 
-        //                 // Navigate to the directory contains OpenShift YAML files
-        //         	dir('OpenShift') {
-		// 		deployOnOpenShift("${openshiftCredentialsID}", "${openshiftCluster}", "${openshifProject}", "${imageName}")
-        //             	}
-        //         }
-        //     }
-        // }
+        stage('Deploy on OpenShift Cluster') {
+            steps {
+                script { 
+                        // Navigate to the directory contains OpenShift YAML files
+                	dir('OpenShift') {
+				deployOnOpenShift("${openshiftCredentialsID}", "${openshiftClusterURL}", "${openshifProject}", "${imageName}")
+                    	}
+                }
+            }
+        }
     }
 
 post {

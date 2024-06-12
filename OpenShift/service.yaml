@@ -1,11 +1,33 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ivolve-website-service
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: "2024-06-12T11:30:32Z"
+  labels:
+    app: ivolve
+    app.kubernetes.io/component: ivolve
+    app.kubernetes.io/instance: ivolve
+  name: ivolve
+  namespace: osamaayman
+  resourceVersion: "810367"
+  uid: f132561f-7a4f-4dbb-bc3e-49c9bd4ec802
 spec:
-  selector:
-    app: ivolve-website
+  clusterIP: 172.30.65.112
+  clusterIPs:
+  - 172.30.65.112
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
   ports:
-    - protocol: TCP
-      port: 8081
-      targetPort: 8080
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    deployment: ivolve
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

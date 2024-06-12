@@ -1,10 +1,33 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: ivolve-website-route
+  annotations:
+    openshift.io/host.generated: "true"
+  creationTimestamp: "2024-06-12T11:32:34Z"
+  labels:
+    app: ivolve
+    app.kubernetes.io/component: ivolve
+    app.kubernetes.io/instance: ivolve
+  name: ivolve
+  namespace: osamaayman
+  resourceVersion: "811056"
+  uid: 919f2812-2dca-4dce-86ef-aecabe9bdc91
 spec:
+  host: ivolve-osamaayman.apps.ocp-training.ivolve-test.com
+  port:
+    targetPort: 8080-tcp
   to:
     kind: Service
-    name: ivolve-website-service
-  port:
-    targetPort: 8081
+    name: ivolve
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2024-06-12T11:32:34Z"
+      status: "True"
+      type: Admitted
+    host: ivolve-osamaayman.apps.ocp-training.ivolve-test.com
+    routerCanonicalHostname: router-default.apps.ocp-training.ivolve-test.com
+    routerName: default
+    wildcardPolicy: None
