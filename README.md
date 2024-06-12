@@ -4,7 +4,7 @@ This project demonstrates a comprehensive DevOps pipeline that integrates Terraf
 
 ## Project Archticture 
 
-![alt text](screenshots/final_project.drawio.svg)
+![alt text](screenshots/final_shape.svg)
 
 
 ## Project Structure
@@ -102,29 +102,7 @@ the objective of Configuration management which is handled by Ansible it's playb
 - Use Ansible roles.
 
 #### Example Ansible Playbook
-```yaml
----
-- name: Configure Jenkins Server
-  hosts: all
-  become: true
-  gather_facts: true
-  roles:
-    - packages
-    - Git
-    - postgres
-    - SonarQube
-    - jenkins
-    - docker
-
-  tasks:
-    - name: Display Jenkins IP
-      debug:
-        msg: "Jenkins server: http://{{ ansible_host }}:8080"
-        
-    - name: Display sonarqube IP
-      debug:
-        msg: "SonarQube server: http://{{ ansible_host }}:9000 , First time Login Credentials: (user: 'admin', password: 'admin')"
-```
+**[Ansible PlayBook ](Ansible/playbook.yml)**
 
 **For detailed information, refer to the [Ansible README](Ansible/README.md)**.
 
@@ -139,45 +117,8 @@ Containerization plays a crucial role in this project's architecture, facilitati
 - **Dockerfile:**
   - A Dockerfile is provided to build the application image. It includes instructions on how to package the application and its dependencies into a Docker container.
 
-### Dockerfile
-```dockerfile
-# Use a minimal base image for building
-FROM gradle:7.3.3-jdk11 AS build
-
-# Set the working directory
-WORKDIR /app
-
-# Copy only the build files needed for dependency resolution
-COPY build.gradle settings.gradle ./
-
-# Download and resolve dependencies using the Gradle Wrapper
-COPY gradlew .
-COPY gradle gradle
-RUN chmod +x gradlew
-RUN ./gradlew dependencies
-
-# Copy the rest of the source code
-COPY . .
-
-# Build the application using the Gradle Wrapper
-RUN chmod +x gradlew
-RUN ./gradlew build --stacktrace
-
-# Use a minimal base image for the runtime
-FROM adoptopenjdk:11-jre-hotspot
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the JAR file from the build stage
-COPY --from=build /app/build/libs/demo-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the port your app runs on
-EXPOSE 8080
-
-# Define the command to run your application
-CMD ["java", "-jar", "app.jar"]
-```
+    ### Dockerfile
+    [Docker File Of Application ](app/Dockerfile)
 
 - **Image Repository:**
   - The Docker image is pushed to a container registry, such as Docker Hub or a private registry, for storage and distribution.
@@ -299,119 +240,7 @@ Ensure the following plugins are installed on your Jenkins instance:
 
 ### 6. Configure Jenkinsfile in Your Repository
 
-```groovy
-@Library('shared_library')_
-pipeline {
-    
-    agent any
-    
-    tools {
-        jdk 'jdk-17'
-        maven 'maven'
-    }
-
-    environment {
-        SCANNER_HOME                = tool 'sonar-scanner'
-        dockerHubCredentialsID	    = 'DockerHub'  		    			                   // DockerHub credentials ID.
-	    imageName                   = 'osayman74/ivolve-website'                           // DockerHub repo/image_name.
-        openshiftCredentialsID	    = 'OpenShift'		    			                   // service account token credentials ID or KubeConfig credentials ID.      = 	    				                         // OC credentials ID.
-        openshiftClusterURL	        = 'https://api.ocp-training.ivolve-test.com:6443'      // OpenShift Cluser URL.
-        openshifProject 	        = 'osamaayman'			     			               // OpenShift project name.    
-    }
-
-    triggers {
-        githubPush() // Trigger pipeline on GitHub push events
-    }
-    
-    stages {
-                        
-        stage('Repo Checkout') {
-            steps {
-            	script {
-                	checkoutRepo
-                }
-            }
-        }
-
-        stage('Run Unit Test') {
-            steps {
-                script {
-                	// Navigate to the directory contains the Application
-                	dir('App') {
-                		runUnitTests
-            		}
-        	   }
-    	    }
-	    }
-
-        stage('Run Code Compile') {
-            steps {
-                script {
-                	// Navigate to the directory contains the Application
-                	dir('App') {
-                		codeCompile
-            		}
-        	    }
-    	    }
-	    }
-	
-        stage('Run SonarQube Analysis') {
-            steps {
-                script {
-                    	// Navigate to the directory contains the Application
-                    	dir('app') {
-                    		runSonarQubeAnalysis()
-                    	}
-                    }
-                }
-            }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                	// Navigate to the directory contains Dockerfile
-                 	dir('app') {
-                 		buildDockerImage("${dockerHubCredentialsID}", "${imageName}")
-                        
-                    	}
-                    }
-                }
-            }
-
-        stage('Push Docker Image') {
-            steps {
-                script {
-                	// Navigate to the directory contains Dockerfile
-                 	dir('app') {
-                 		pushDockerImage("${dockerHubCredentialsID}", "${imageName}")
-                        
-                    	}
-                }
-            }
-        }
-
-        stage('Deploy on OpenShift Cluster') {
-            steps {
-                script { 
-                        // Navigate to the directory contains OpenShift YAML files
-                	dir('OpenShift') {
-				deployOnOpenShift("${openshiftCredentialsID}", "${openshiftClusterURL}", "${openshifProject}", "${imageName}")
-                    	}
-                }
-            }
-        }
-    }
-
-post {
-        success {
-            echo "${JOB_NAME}-${BUILD_NUMBER} pipeline succeeded"
-        }
-        failure {
-            echo "${JOB_NAME}-${BUILD_NUMBER} pipeline failed"
-        }
-    }
-}
-```
+  **[My Jenkins File ](jenkinsfile)**
 
 Add a `Jenkinsfile` to the root of your repository with the above pipeline script.
 
@@ -475,67 +304,7 @@ This script automates the entire process of provisioning infrastructure with Ter
 
 ### Script: `run.sh`
 
-```bash
-#!/bin/bash
-
-# Script to run Terraform, update Ansible inventory with EC2 IP, then run Ansible playbook
-
-# Set the paths to Terraform and Ansible directories
-terraform_dir="/home/osamaayman/Documents/MultiCloudDevOpsProject/Terraform"
-ansible_dir="/home/osamaayman/Documents/MultiCloudDevOpsProject/Ansible"
-inventory_file="$ansible_dir/inventory.txt"
-private_key_file="/home/osamaayman/.ssh/jenkins-ec2"
-
-# Function to check for necessary tools
-check_tools() {
-    command -v terraform >/dev/null 2>&1 || { echo "Terraform is required but it's not installed. Aborting."; exit 1; }
-    command -v ansible-playbook >/dev/null 2>&1 || { echo "Ansible is required but it's not installed. Aborting."; exit 1; }
-}
-
-# Function to run Terraform
-run_terraform() {
-    cd "$terraform_dir" || { echo "Failed to navigate to Terraform directory. Aborting."; exit 1; }
-    echo "Running Terraform in $terraform_dir"
-    terraform init
-    terraform apply -auto-approve
-    echo "Terraform execution completed."
-}
-
-# Function to update the Ansible inventory file with the EC2 IP
-update_inventory() {
-    echo "Updating Ansible inventory file"
-    cd "$terraform_dir" || { echo "Failed to navigate to Terraform directory. Aborting."; exit 1; }
-    ip_address=$(cat ec2-ip.txt)
-    if [ -z "$ip_address" ]; then
-        echo "No IP address found in ec2-ip.txt. Aborting."
-        exit 1
-    fi
-    echo -e "jenkins-ec2 ansible_host=${ip_address} ansible_user=ubuntu ansible_ssh_private_key_file=${private_key_file}" > "$inventory_file"
-    echo "ansible_host is updated in inventory file."
-}
-
-# Function to clean ec2-ip.txt
-clean_ec2_ip() {
-    cd "$terraform_dir" || { echo "Failed to navigate to Terraform directory. Aborting."; exit 1; }
-    echo "" > ec2-ip.txt
-}
-
-# Function to run the Ansible playbook
-run_ansible() {
-    cd "$ansible_dir" || { echo "Failed to navigate to Ansible directory. Aborting."; exit 1; }
-    echo "Running Ansible playbook in $ansible_dir"
-    export ANSIBLE_HOST_KEY_CHECKING=False
-    ansible-playbook -i inventory.txt playbook.yml --ask-vault-pass
-    echo "Ansible execution completed."
-}
-
-# Main script execution
-check_tools
-run_terraform
-update_inventory
-clean_ec2_ip
-run_ansible
-```
+  **[Bash Script to Automate Installation](scripts/run.sh)**
 
 ### Steps to Run the Script
 
