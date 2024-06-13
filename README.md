@@ -106,6 +106,14 @@ the objective of Configuration management which is handled by Ansible it's playb
 
 **For detailed information, refer to the [Ansible README](Ansible/README.md)**.
 
+**After Ansible Confiquration end you will be able to acess jenkins and SonaQube website**
+
+- jenkins fully installed and confiqure.
+![alt text](screenshots/jenkins.png)
+
+- SonarQube installed 
+![alt text](screenshots/SonarQube.png)
+
 ## Containerization
 Containerization plays a crucial role in this project's architecture, facilitating efficient deployment and management of applications. Docker is the primary tool used for containerization.
 
