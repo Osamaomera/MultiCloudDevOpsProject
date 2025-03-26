@@ -224,7 +224,11 @@ Ensure the following plugins are installed on your Jenkins instance:
    - Name: `shared_library`
    - Default version: `main` (or the default branch of your shared library)
    - Retrieval method: Modern SCM
+<<<<<<< HEAD
+   - Select "Git" and provide the repository URL of your shared library: https://github.com/Osamaomera/shared_library_ivolve.git.
+=======
    - Select "Git" and provide the repository URL of your shared library: [Shared Library Repo](https://github.com/Osamaomera/shared_library_ivolve.git).
+>>>>>>> fc49595ffd705e1009baf9a68e4425168700b36c
    - Add credentials if required.
 5. Click "Save".
 
